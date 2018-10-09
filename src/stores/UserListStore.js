@@ -4,24 +4,32 @@ const axios = require('axios');
 
 const ob = observable({
     data: [],
+    totalItems: 0,
+    currentPage: 1, 
+    pageSize: 0
 });
 
-autorun(() => {    
+const getUserListByPage = () => {
     axios.get('https://reqres.in/api/users', {
         params: {
-          page: 1
+          page: ob.currentPage
         }
     })
     .then(function (response) {
         //shallow copy of the user data
         let data = response.data.data.slice();
-        console.log(data)
         ob.data = data;
+        ob.totalItems = response.data.total;
+        ob.pageSize = response.data.per_page;
     })
+}
+autorun(() => {    
+    getUserListByPage();
 });
 
 const UserListStore = {
     ob,
+    getUserListByPage
 };
 
 export default UserListStore;
